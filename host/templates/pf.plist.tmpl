@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>${LABEL_PREFIX}.pf</string>
+	<!-- At boot this job races Apple's com.apple.pfctl (also RunAtLoad, loading
+	     stock /etc/pf.conf); whichever pfctl runs last owns the ruleset, so a
+	     single load can be silently clobbered and the dsh-egress anchor lost.
+	     Instead of one load, watch the anchor for two minutes and re-load
+	     whenever it is missing. -->
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/sh</string>
+		<string>-c</string>
+		<string>for i in $(seq 1 24); do /sbin/pfctl -a dsh-egress -sr 2>/dev/null | grep -q . || /sbin/pfctl -E -f /usr/local/etc/pf-dsh.conf; sleep 5; done</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>WatchPaths</key>
+	<array>
+		<string>/etc/pf.conf</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>${LOG_DIR}/${LABEL_PREFIX}.pf.log</string>
+</dict>
+</plist>

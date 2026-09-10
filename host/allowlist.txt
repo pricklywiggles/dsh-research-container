@@ -1,0 +1,11 @@
+# Squid domain allowlist for the dsh container. One domain per line; a leading
+# dot allows all subdomains. Everything here is reachable from the container
+# over the proxy; everything else is denied. Starts fully closed.
+# After editing, apply with: /opt/homebrew/opt/squid/sbin/squid -k reconfigure
+#
+#.npmjs.org
+#.github.com
+#.githubusercontent.com
+#.debian.org
+#.pypi.org
+#.pythonhosted.org

@@ -1,0 +1,30 @@
+# SearXNG for the dsh box: private instance, JSON API on for dsh-web-tools.
+use_default_settings: true
+
+server:
+  secret_key: "${SEARXNG_SECRET}"
+  limiter: false
+  image_proxy: false
+
+search:
+  formats:
+    - html
+    - json
+
+# Agent bursts get the big engines suspended ("too many requests"/CAPTCHA);
+# diversity keeps results flowing while suspensions expire.
+outgoing:
+  request_timeout: 6.0
+  max_request_timeout: 15.0
+
+engines:
+  - name: bing
+    disabled: false
+  - name: mojeek
+    disabled: false
+  - name: qwant
+    disabled: false
+  - name: wikipedia
+    disabled: false
+  - name: duckduckgo
+    timeout: 6.0

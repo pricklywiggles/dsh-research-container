@@ -1,0 +1,47 @@
+# DeepSeek Harness settings, mounted at $DSH_HOME inside the container.
+# The baseURL points at the socat relay on the vmnet gateway; the macOS host
+# forwards it to MODEL_HOST from config.env. The container never sees that address.
+llm-pi-ai:
+  providers:
+    local-model:
+      api: openai-completions
+      baseURL: http://192.168.66.1:8090/v1
+      # Set LOCAL_MODEL_API_KEY at `container run` (any non-empty value if the
+      # server ignores auth), or enter a key in Settings -> Models instead.
+      apiKeyEnv: LOCAL_MODEL_API_KEY
+      models:
+        - id: qwen38
+          input:
+            - text
+            - image
+          contextWindow: 110592
+          maxTokens: 4096
+      compat:
+        supportsDeveloperRole: false
+        maxTokensField: max_tokens
+# The Crawl4AI MCP server is mounted via a row in cordis.patch.yml (this
+# directory), not here: dsh-mcp-client is a raw plugin, not a bundle.
+ui-onboarding:
+  welcomeNoticeVersion: 2026-08-13.1
+agent-default-model:
+  provider: local-model
+  model: qwen38
+agent-presets:
+  default: standard
+permission:
+  defaultPreset: danger-full-access
+ui-theme:
+  preference: dark
+dsh-web-tools:
+  providerBaseUrls:
+    tavily: ""
+    exa: ""
+    firecrawl: ""
+    parallel: ""
+    brave: ""
+    you: ""
+    jina: ""
+    searxng: http://192.168.66.1:8888
+  searchRoutingPolicy: ordered
+  defaultProvider: searxng
+  fallbackOrder: [searxng]

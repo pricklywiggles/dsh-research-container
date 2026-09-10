@@ -1,0 +1,28 @@
+# Egress lockdown for the dsh container network. Loaded into anchor "dsh-egress"
+# by /usr/local/etc/pf-dsh.conf. Every rule is scoped to the container subnets,
+# so host traffic (Wi-Fi, Tailscale, VPN) can never match.
+
+dsh_net  = "${SUBNET}"
+dsh_net6 = "${SUBNET6}"
+gw = "${GATEWAY}"
+
+# host-initiated connections into the container (UI on :3081, exec, published ports)
+pass out quick inet  from any to $dsh_net  keep state
+pass out quick inet6 from any to $dsh_net6 keep state
+
+# allowed egress on the gateway: squid (3128), model relay (8090),
+# searxng relay (8888), crawl4ai relay (8890)
+pass in quick inet proto tcp from $dsh_net to $gw port { ${SQUID_PORT}, ${MODEL_RELAY_PORT}, ${SEARXNG_PORT}, ${CRAWL4AI_PORT} } keep state
+
+# DNS restricted to the gateway resolver: names resolve, connections still die
+# at pf/squid. Comment out to also close the DNS exfiltration channel (proxy
+# CONNECT does not need container-side DNS).
+pass in quick inet proto udp from $dsh_net to $gw port 53 keep state
+
+# Direct model access via vmnet NAT into the tailnet, bypassing the relay.
+# NAT into a utun interface is unreliable; enable only after testing.
+# pass in quick inet proto tcp from $dsh_net to <model-ip> port <port> keep state
+
+# default deny: everything else leaving the container network
+block drop in quick inet  from $dsh_net  to any
+block drop in quick inet6 from $dsh_net6 to any

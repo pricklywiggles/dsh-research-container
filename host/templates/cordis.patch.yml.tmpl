@@ -1,0 +1,26 @@
+# Home-level patch layer (applies over every profile; survives seed syncs).
+# Mounts the MCP client as a row: it is a raw cordis plugin, not a dsh bundle,
+# so it cannot go in the profile's bundles list.
+- insert:
+    - id: mcp-crawl4ai
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        transport: stdio
+        serverName: crawl4ai
+        command: supergateway
+        args:
+          - --sse
+          - http://${GATEWAY}:${CRAWL4AI_PORT}/mcp/sse
+          - --header
+          - "Authorization: Bearer ${CRAWL4AI_TOKEN}"
+        toolCallTimeoutMs: 120000
+        failOnStartupError: false
+
+# Config for the circuit-breaker row that the plugin's bundle patch inserts.
+# A denial is not a kill: the incident log is how a parent notices a tripped
+# subagent and reacts (see skills/deep-research-run). Tested live: the
+# settings.yaml plugin-name namespace does NOT reach this plugin's config;
+# this patch-layer override does.
+- id: circuit-breaker
+  config:
+    incidentLog: /workspace/.circuit-breaker-incidents.jsonl

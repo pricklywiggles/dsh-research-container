@@ -1,0 +1,40 @@
+# Local configuration and secrets. Never commit these.
+# config.example.env is the committed template; config.env is per-machine.
+# gitignore has no inline comments: a trailing "# ..." becomes part of the
+# pattern and silently unignores the path, so every comment gets its own line.
+config.env
+config.env.bak.*
+secrets.env
+.pf-was-enabled
+
+# dsh state. dsh-home/ is a live volume: some of it is source (settings,
+# skills), most of it is generated or private.
+# ~370 MB of node_modules, rebuilt from the image:
+dsh-home/profiles/
+# full conversation transcripts, private:
+dsh-home/sessions/
+# workspace paths and session caches:
+dsh-home/storages/
+# written by the entrypoint:
+dsh-home/.seed-version
+# provider API keys:
+dsh-home/.credentials.yaml
+# local preset experiments:
+dsh-home/.agent-presets/
+# rendered from host/templates/cordis.patch.yml.tmpl with the live
+# CRAWL4AI_TOKEN inside; the template is the committed source:
+dsh-home/cordis.patch.yml
+
+# Rendered from templates by setup-host.sh, machine-specific.
+host/rendered/
+host/com.*.plist
+
+# The agent's working directory. Yours, not the project's.
+workspace/*
+!workspace/.gitkeep
+
+# macOS
+.DS_Store
+
+# Python bytecode from the validate_json helper the deep-research skill runs.
+__pycache__/

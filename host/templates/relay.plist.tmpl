@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>__LABEL__</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>${BREW_PREFIX}/bin/socat</string>
+		<string>TCP-LISTEN:__LISTEN_PORT__,bind=${GATEWAY},fork,reuseaddr</string>
+		<string>TCP:__TARGET__</string>
+	</array>
+	<key>UserName</key>
+	<string>${USER_NAME}</string>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>ThrottleInterval</key>
+	<integer>15</integer>
+	<key>StandardErrorPath</key>
+	<string>${LOG_DIR}/__LABEL__.log</string>
+</dict>
+</plist>
