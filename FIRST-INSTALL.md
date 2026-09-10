@@ -68,14 +68,19 @@ Model server: an OpenAI-compatible server on a Tailscale peer
   config before anything touches the host.
 - **Change:** added the `./doctor.sh` line to setup.sh's closing Next list.
 
-### 2. Cosmetic: doctor.sh "Next" line re-lists ./setup.sh — logged only
+### 2. Cosmetic: doctor.sh "Next" line re-lists ./setup.sh — fixed (later)
 
-- **What happened:** doctor.sh ends with
+- **What happened:** doctor.sh ended with
   `Preflight clear. Next: ./setup.sh, ./setup-host.sh, ./run.sh, ./verify.sh`
   even when `config.env` already exists (doctor itself just verified it).
 - **What a user would think:** momentary "wait, do I need to run setup.sh
   again?" It reads as the full pipeline, not the next action.
-- **Change:** none (cosmetic; left for the maintainer to decide phrasing).
+- **Change:** initially logged only; fixed at the owner's request after the
+  full install verified. The verdict now picks the actual next step from
+  state doctor already checked: missing secrets/anchor → ./setup-host.sh;
+  box not running → ./run.sh; box running → ./verify.sh. (The missing-
+  config.env branch is mostly theoretical: an absent MODEL_HOST is a FAIL,
+  which short-circuits before the Next line.)
 
 ### 3. run.sh dies instantly and silently on every first run — fixed
 

@@ -102,6 +102,15 @@ want the change to survive. `dsh-home/settings.yaml` already points the plugin
 at the relay, so there is nothing to set in the UI. No API keys, and search
 queries stay on your machines.
 
+Upstream engines throttle bursty traffic from a single IP, so during heavy
+agent use `container logs searxng` fills with CAPTCHA and "too many
+requests" suspensions (DuckDuckGo, Qwant, and Brave are the usual ones).
+That is normal, not a broken box: the engine mix in
+`host/templates/searxng-settings.yml.tmpl` exists so other engines keep
+answering while suspensions expire on their own, typically within minutes.
+A thin or empty result set is only a real problem if verify.sh check 5
+(open-network egress) fails too — check 7 tells the two apart.
+
 Page fetching runs through a self-hosted [Crawl4AI](https://github.com/unclecode/crawl4ai)
 container (same trust pattern: open network, gateway relay on 8890; image
 derived in `host/crawl4ai/` to bind non-loopback, token auth). Its built-in
