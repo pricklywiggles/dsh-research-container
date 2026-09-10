@@ -36,6 +36,24 @@ Model server: an OpenAI-compatible server on a Tailscale peer
   again?" It reads as the full pipeline, not the next action.
 - **Change:** none (cosmetic; left for the maintainer to decide phrasing).
 
+### 3. run.sh dies instantly and silently on every first run — fixed
+
+- **README said:** "4. `run.sh` ... The first build takes a few minutes."
+- **What happened:** `./run.sh` exited with code 1 and printed *nothing*.
+  Cause: `have_subnet="$(container network inspect dshnet 2>/dev/null | jq ...)"`
+  runs under `set -euo pipefail` (inherited from lib/config.sh). On a first
+  run the `dshnet` network does not exist yet, `container network inspect`
+  (apple/container 1.3.1) exits 1, pipefail makes the substitution fail, and
+  `set -e` kills the script — with the only error message redirected to
+  /dev/null.
+- **What a user would think:** "It just... exits? No error, no log, nothing."
+  This is the worst failure of the install: it happens to 100% of first runs,
+  right after three steps that all succeeded, and gives zero clues. A user
+  without bash-trace skills is dead in the water.
+- **Change:** appended `|| true` to that pipeline so a missing network reads
+  as the intended empty string (same pattern the script already uses for
+  `container image prune` further down).
+
 ### Non-repo notes (environment, not README failures)
 
 - The wizard's local-port probe correctly found nothing (model server is on a
