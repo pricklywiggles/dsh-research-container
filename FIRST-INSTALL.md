@@ -127,6 +127,26 @@ Model server: an OpenAI-compatible server on a Tailscale peer
   behavior). Noted here so the maintainer can decide whether entrypoint or
   verify.sh should probe for it.
 
+### 7. The point of the project was buried — README restructured
+
+- **README said:** `/research` and `/deep-research` existed only as a
+  "Skills" list inside the **UI: better-sidebar** section, after pnpm
+  build-script and node-pty compilation trivia. The setup flow ended at
+  "Choose `/workspace` and go" — go *where* was never said.
+- **What happened:** verified in the UI that both are live and discoverable
+  (`/` opens the command menu; `/research` and all five `/deep-research-*`
+  skills appear under Skills). The machinery is fine; the README just never
+  points a new user at it.
+- **What a user would think:** they finish setup facing a blank chat box,
+  ask it something, shrug, and never learn the box replaces their hosted
+  deep-research tools — unless they read 90 lines past "go" into a section
+  ostensibly about a sidebar plugin.
+- **Change:** gave the skills their own `## Research skills` section (after
+  Web research, before the loop guard) framed as the reason the box exists,
+  and added a line right after the workspace-picker instruction: "Then type
+  `/research <your topic>`...". No content removed; the sidebar section now
+  covers only the sidebar.
+
 ### Non-repo notes (environment, not README failures)
 
 - The wizard's local-port probe correctly found nothing (model server is on a

@@ -69,7 +69,12 @@ Then open **http://127.0.0.1:3080**. Type the IP form, not `localhost`: the
 publish binds IPv4 loopback only, and apple/container cannot publish v4 and v6
 on the same host port. In the workspace picker, click the pencil icon and type
 `/workspace` — the picker opens in the container's (empty) home directory and
-`/workspace` is not browsable from there. Then go.
+`/workspace` is not browsable from there.
+
+Then type `/research <your topic>` in the chat box. That command — and the
+`/deep-research` family next to it — is what this box exists for: deep,
+cited web research where no query, page fetch, or model token ever leaves
+your own infrastructure. [Research skills](#research-skills) describes them.
 
 ## Allowing a destination
 
@@ -123,6 +128,25 @@ preset realm labels, confirmed via a Creator-mode inspection session, and even
 `agentPresets.serviceForAgent` resolution failed in practice. Multi-page cited
 research works fine without it via the search+fetch loop above.
 
+## Research skills
+
+The reason this box exists: slash-invocable research commands that replace
+hosted deep-research tools, running entirely on infrastructure you control.
+They are dsh's Claude-style SKILL.md dirs, live-discovered from
+`dsh-home/skills/` — type `/` in the chat box to see them.
+
+- `/research <topic>` runs a one-shot deep exploration with pacing, fetch
+  fallbacks, and a cited gaps-and-contradictions report.
+- The `/deep-research` family is a port of
+  [Weizhena/Deep-Research-skills](https://github.com/Weizhena/Deep-Research-skills):
+  structured items×fields research with human-in-the-loop checkpoints.
+  Flow: `/deep-research <topic>` (outline as outline.yaml + fields.yaml in
+  /workspace) → `/deep-research-add-items` / `-add-fields` (refine) →
+  `/deep-research-run` (parallel researcher subagents write validated JSON
+  per item) → `/deep-research-report` (markdown report, uncertain values
+  skipped). The researcher briefing + search-strategy modules live in
+  `dsh-home/skills/deep-research/`.
+
 ## Loop guard: dsh-circuit-breaker
 
 Local models in agent loops fail in one specific way: degenerate repetition.
@@ -160,20 +184,6 @@ profile's `pnpm-workspace.yaml` before installing. node-pty has no linux-arm64
 prebuild and compiles from source via node-gyp, which is why `build-essential`
 and `python3` are in the image. Without the compile the plugin still loads,
 just with the terminal disabled ("degraded mode").
-
-Skills (dsh's Claude-style SKILL.md dirs, live-discovered from
-`dsh-home/skills/`, slash-invocable):
-- `/research` runs a one-shot deep exploration with pacing, fetch fallbacks,
-  and a cited gaps-and-contradictions report.
-- The `/deep-research` family is a port of
-  [Weizhena/Deep-Research-skills](https://github.com/Weizhena/Deep-Research-skills):
-  structured items×fields research with human-in-the-loop checkpoints.
-  Flow: `/deep-research <topic>` (outline as outline.yaml + fields.yaml in
-  /workspace) → `/deep-research-add-items` / `-add-fields` (refine) →
-  `/deep-research-run` (parallel researcher subagents write validated JSON
-  per item) → `/deep-research-report` (markdown report, uncertain values
-  skipped). The researcher briefing + search-strategy modules live in
-  `dsh-home/skills/deep-research/`.
 
 ## Daily use
 
