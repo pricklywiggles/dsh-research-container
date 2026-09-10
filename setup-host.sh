@@ -29,15 +29,20 @@ PF_STATE_FILE=.pf-was-enabled
 say() { printf '\n==> %s\n' "$*"; }
 
 # No TTY (e.g. run from Claude Code): sudo can't prompt, so use a GUI dialog.
+# -A is needed whenever there is no TTY, including when the caller exported
+# its own SUDO_ASKPASS: without it sudo ignores the helper and dies with
+# "a terminal is required to read the password".
 SUDO_FLAGS=""
-if [ ! -t 0 ] && [ -z "${SUDO_ASKPASS:-}" ]; then
-  askpass="$(mktemp)"
-  cat > "$askpass" <<'EOF'
+if [ ! -t 0 ]; then
+  if [ -z "${SUDO_ASKPASS:-}" ]; then
+    askpass="$(mktemp)"
+    cat > "$askpass" <<'EOF'
 #!/bin/sh
 exec /usr/bin/osascript -e 'text returned of (display dialog "sudo password for dsh host setup" default answer "" with hidden answer with title "dsh setup" buttons {"Cancel", "OK"} default button "OK")'
 EOF
-  chmod 700 "$askpass"
-  export SUDO_ASKPASS="$askpass"
+    chmod 700 "$askpass"
+    export SUDO_ASKPASS="$askpass"
+  fi
   SUDO_FLAGS="-A"
 fi
 # announce on stderr so as_root output can be piped safely
