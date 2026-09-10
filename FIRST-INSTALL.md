@@ -1,5 +1,35 @@
 # First-install log
 
+## Verification results (2026-09-10)
+
+- [x] 1. Five setup commands ran in the README's order. After the fixes below,
+  no step needed outside knowledge except the workspace-picker pencil trick
+  (entry 4, now in the README).
+- [x] 2. `./doctor.sh` after setup-host.sh: 31 ok, 0 warn, **0 FAIL**.
+- [x] 3. `./verify.sh`: all checks pass — **0 failed, 0 warned** (the script
+  runs 8 checks, not 4: lockdown ×4 plus agent-tools ×4).
+- [x] 4. UI loads at http://127.0.0.1:3080, workspace picker accepted
+  `/workspace` (via pencil icon), chat turn answered by qwen38
+  ("17 × 23 = 391.", 82 tok/s).
+- [x] 5. Web research: asked for the latest stable Squid release. Agent
+  searched via SearXNG (query visible in trajectory), fetched
+  squid-cache.org/Versions and the GitHub SQUID_7_7 tag via
+  `mcp__crawl4ai__md` (both calls visible in `container logs dsh`), and
+  answered v7.7 / 2026-08-24 with both URLs cited. Answer matches the squid
+  7.7 Homebrew just installed. One expected red Fetch error (entry 5).
+- [x] 6. Lockdown from inside: `container exec dsh curl -m 5
+  https://example.com` fails (squid CONNECT 403 via the shipped proxy env;
+  the raw no-proxy path is blocked by pf per verify check 2), and an explicit
+  squid request to an unallowlisted domain is denied 403.
+- [x] 7. Circuit breaker: tripped it deliberately (20 identical `date`
+  calls → 6 ran, 14 denied with the breaker's message; one `duplicate`
+  incident in `/workspace/.circuit-breaker-incidents.jsonl`). No plugin
+  reports "did not activate". Note: `container logs dsh` shows no activation
+  line at boot (entry 6).
+- [ ] 8. stop.sh / run.sh persistence cycle — NOT RUN (stopped here on the
+  owner's instruction).
+- [ ] 9. teardown-host.sh + reinstall — NOT RUN (same).
+
 A cold install of dsh-research-container on a clean Mac (Apple silicon,
 macOS 27 / Darwin 27.0.0), following README.md literally, top to bottom.
 One entry per friction point: what the README said, what actually happened,
