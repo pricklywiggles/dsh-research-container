@@ -16,6 +16,22 @@
         toolCallTimeoutMs: 120000
         failOnStartupError: false
 
+# Disable the model-facing web_fetch tool. Its provider pool (dsh-web-tools'
+# fetch providers) is deliberately empty in this box — Crawl4AI is the fetcher
+# — so the registered tool could only ever error "registered but unavailable"
+# in the trajectory before the agent falls back to mcp__crawl4ai__md. The
+# skills already say "do not use Fetch"; not registering it is the reliable
+# version of that instruction. Patch config rows replace the whole object
+# (no per-key merge), so the search keys from the plugin's own patch layer
+# are restated here.
+- id: tool-web
+  config:
+    search: true
+    fetch: false
+    searchMaxQueries: 4
+    searchMaxResults: 8
+    searchTimeoutMs: 60000
+
 # Config for the circuit-breaker row that the plugin's bundle patch inserts.
 # A denial is not a kill: the incident log is how a parent notices a tripped
 # subagent and reacts (see skills/deep-research-run). Tested live: the

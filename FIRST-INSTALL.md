@@ -147,6 +147,26 @@ Model server: an OpenAI-compatible server on a Tailscale peer
   `/research <your topic>`...". No content removed; the sidebar section now
   covers only the sidebar.
 
+### 8. Dead Fetch tool now unregistered instead of documented — fixed
+
+- **Follow-up to entry 5**, at the owner's request ("is there an easy way to
+  not register the tool that shows the error that we dont even use").
+- **What was happening:** dsh-web-tools' own patch layer sets `tool-web:
+  fetch: true`, registering the model-facing `web_fetch` tool, while `web:
+  fetchProvider: dsh-web-tools-fetch` points it at a provider pool that is
+  deliberately empty in this box. Every fetch attempt errored red; the
+  skills carried a prompt-level "do NOT use the built-in Fetch tool"
+  workaround — the kind of instruction the README's own loop-guard section
+  argues cannot be relied on.
+- **Change:** added a `tool-web` override (`fetch: false`, search keys
+  restated since patch config rows replace wholesale) to
+  `host/templates/cordis.patch.yml.tmpl`, re-rendered
+  `dsh-home/cordis.patch.yml` via the repo's own `render()`, and restarted
+  the dsh container. Verified with a fresh research turn: SearXNG search →
+  `mcp__crawl4ai__md` directly, no Fetch step, no red error; answer (socat
+  1.8.1.3, 2026-06-26) cited and correct. The README sentence from entry 5
+  was updated to describe the disabled tool rather than the expected error.
+
 ### Non-repo notes (environment, not README failures)
 
 - The wizard's local-port probe correctly found nothing (model server is on a

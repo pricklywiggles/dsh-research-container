@@ -113,12 +113,13 @@ bundle, and the home patch layer survives seed syncs. The agent gets
 them: ask it to research something and it searches via SearXNG, reads pages
 via Crawl4AI, and cites them.
 
-Expect one red error in research turns: dsh-web-tools also registers its own
-generic Fetch tool, and every fetch-capable provider behind it is deliberately
-unconfigured (Crawl4AI is the fetcher here), so a first fetch attempt logs
-`configured web provider "dsh-web-tools-fetch" is registered but unavailable`
-before the agent falls back to `mcp__crawl4ai__md`. The turn still succeeds;
-the error is cosmetic.
+dsh-web-tools also ships a generic `web_fetch` tool, but every fetch-capable
+provider behind it is deliberately unconfigured here (Crawl4AI is the
+fetcher), so this box disables its registration outright: the `tool-web` row
+in `host/templates/cordis.patch.yml.tmpl` sets `fetch: false`. Without it,
+each research turn logged a red "registered but unavailable" error before
+falling back to Crawl4AI, and the skills had to carry a prompt-level "do not
+use Fetch" warning that a looping model would eventually ignore.
 
 The [@dsh-external/dsh-deep-research](https://github.com/omdsh-dev/dsh-deep-research)
 orchestrator is also baked in (pinned to the PR #5 branch) but does NOT work
