@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# debug hatch: `container run dsh-box <cmd>` runs <cmd> instead of the server
+# debug hatch: `container run dsh-research-container <cmd>` runs <cmd> instead of the server
 if [ "$#" -gt 0 ]; then
   exec "$@"
 fi

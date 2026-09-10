@@ -1,4 +1,4 @@
-# dsh box documentation
+# dsh-research-container documentation
 
 Everything learned building and running this setup: a DeepSeek Harness
 (dsh) agent in an Apple `container` VM with default-deny egress enforced on

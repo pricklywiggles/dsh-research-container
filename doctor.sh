@@ -1,5 +1,5 @@
 #!/bin/bash
-# Preflight for the dsh box. Read-only: it changes nothing and never asks for
+# Preflight for the dsh research container. Read-only: it changes nothing and never asks for
 # sudo. Run it before setup-host.sh to catch the problems that are expensive to
 # diagnose later, and after an install to see what is actually in place.
 #

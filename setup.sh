@@ -1,5 +1,5 @@
 #!/bin/bash
-# Interactive configuration for the dsh box. Writes config.env.
+# Interactive configuration for the dsh research container. Writes config.env.
 #
 # Asks as little as possible: it probes for your model server, reads the model
 # list from it, checks ports and subnets against what your Mac already uses,
@@ -77,7 +77,7 @@ PREV_UI_PORT="${UI_PORT:-}"; PREV_SQUID_PORT="${SQUID_PORT:-}"
 PREV_MODEL_RELAY_PORT="${MODEL_RELAY_PORT:-}"
 PREV_SEARXNG_PORT="${SEARXNG_PORT:-}"; PREV_CRAWL4AI_PORT="${CRAWL4AI_PORT:-}"
 
-bold "dsh box setup"
+bold "dsh-research-container setup"
 dim  "Writes config.env. Nothing is installed or changed on your system yet."
 echo
 
@@ -200,7 +200,7 @@ fi
 # ---------------------------------------------------------------- host ------
 
 echo; bold "4. Host"
-LABEL_PREFIX="$(ask 'launchd label prefix' "${LABEL_PREFIX:-local.dshbox}")"
+LABEL_PREFIX="$(ask 'launchd label prefix' "${LABEL_PREFIX:-local.dsh-research-container}")"
 
 cores="$(sysctl -n hw.ncpu 2>/dev/null || echo 8)"
 gb="$(( $(sysctl -n hw.memsize 2>/dev/null || echo 17179869184) / 1073741824 ))"

@@ -1,12 +1,12 @@
 #!/bin/bash
-# Create/refresh the dsh box: network, image build, container run.
+# Create/refresh the dsh research container: network, image build, container run.
 # Safe to re-run; it replaces the running container with a fresh one.
 cd "$(dirname "$0")"
 . lib/config.sh
 
 NET=dshnet
 NAME=dsh
-IMAGE=dsh-box
+IMAGE=dsh-research-container
 GW="$GATEWAY"
 
 # Containers store their ports, mounts and env at creation time. Starting a

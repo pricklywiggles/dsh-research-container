@@ -201,7 +201,7 @@ emergency.
 apple/container stores each image generation as an uncompressed snapshot under
 `~/Library/Application Support/com.apple.container/snapshots/`, and replacing a
 tag abandons the previous generation instead of collecting it. Every `./run.sh`
-therefore strands roughly 4 GB for dsh-box and 7.6 GB for crawl4ai-local.
+therefore strands roughly 4 GB for dsh-research-container and 7.6 GB for crawl4ai-local.
 Nothing reclaims them on its own. One machine here reached 98 GB this way.
 
 This is upstream [apple/container#2164](https://github.com/apple/container/issues/2164),
@@ -231,7 +231,7 @@ Two heavier levers, in the order to reach for them:
 
 - `container image prune --all` also drops unused *tagged* images. That
   includes the base images (`node`, `searxng/searxng`, `unclecode/crawl4ai`)
-  and `dsh-box-lockrefresh`, the throwaway `scripts/refresh-lockfile.sh`
+  and `dsh-research-container-lockrefresh`, the throwaway `scripts/refresh-lockfile.sh`
   builds. All are pinned by digest, so the next build re-pulls them.
 - `container builder delete -f` discards buildkit's cache, which grows to tens
   of GB on its own. Recreate it with
@@ -266,7 +266,7 @@ Before pushing this repo anywhere public: rotate the two tokens in
 
 ```sh
 container stop dsh searxng crawl4ai; container rm dsh searxng crawl4ai
-container image rm dsh-box crawl4ai-local        # optional
+container image rm dsh-research-container crawl4ai-local        # optional
 container network rm dshnet                      # optional
 rm -rf dsh-home/profiles dsh-home/.seed-version  # forces a clean plugin sync
 ./run.sh

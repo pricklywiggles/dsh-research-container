@@ -69,7 +69,7 @@ GATEWAY="$(printf '%s' "${SUBNET:-192.168.66.0/24}" | awk -F'[./]' '{print $1"."
 
 MODEL_HOST="${MODEL_HOST:-}"   # no default on purpose; see config.example.env
 MODEL_ID="${MODEL_ID:-qwen38}"
-LABEL_PREFIX="${LABEL_PREFIX:-local.dshbox}"
+LABEL_PREFIX="${LABEL_PREFIX:-local.dsh-research-container}"
 BUILDER_CACHE_MAX_GB="${BUILDER_CACHE_MAX_GB:-25}"
 LOG_DIR="$BREW_PREFIX/var/logs"
 

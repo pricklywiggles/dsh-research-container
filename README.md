@@ -1,4 +1,4 @@
-# dsh box: DeepSeek Harness in a locked-down Apple container
+# dsh-research-container: DeepSeek Harness in a locked-down Apple container
 
 A Debian VM-container (Apple `container` runs each container in its own
 lightweight VM) with the DeepSeek Harness (`dsh`), Node 24, and general dev

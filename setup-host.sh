@@ -1,5 +1,5 @@
 #!/bin/bash
-# One-shot host setup for the locked-down dsh box. Idempotent; run it again
+# One-shot host setup for the locked-down dsh research container. Idempotent; run it again
 # freely. Everything privileged is announced before it runs. Nothing here
 # edits system-owned files: /etc/pf.conf, system DNS, routes, and macOS proxy
 # settings are untouched. teardown-host.sh reverts all of it.
