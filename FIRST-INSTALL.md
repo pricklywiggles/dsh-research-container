@@ -54,6 +54,49 @@ Model server: an OpenAI-compatible server on a Tailscale peer
   as the intended empty string (same pattern the script already uses for
   `container image prune` further down).
 
+### 4. "Choose /workspace and go" hides a picker maze — README fixed
+
+- **README said:** "Then open http://127.0.0.1:3080 ... Choose `/workspace`
+  and go."
+- **What happened:** the workspace picker opens in the container's home
+  directory (`/home/dev`), which is empty, with no visible way to reach
+  `/workspace`. You have to notice the small pencil icon, click it, and type
+  the path. Pressing Enter in the path field does nothing visible; you must
+  click Open.
+- **What a user would think:** "The picker is empty. Where is /workspace?"
+  Thirty seconds of confusion at the exact moment the README says "and go".
+- **Change:** README now says to click the pencil and type `/workspace`.
+
+### 5. First research turn shows a red Fetch error — README note added
+
+- **README said:** "ask it to research something and it searches via SearXNG,
+  reads pages via Crawl4AI, and cites them."
+- **What happened:** exactly that — but the trajectory first shows a red
+  `Error: configured web provider "dsh-web-tools-fetch" is registered but
+  unavailable`, because dsh-web-tools registers a generic Fetch tool whose
+  fetch-capable providers (tavily, jina, firecrawl...) are all deliberately
+  blank in `dsh-home/settings.yaml`. The agent then falls back to
+  `mcp__crawl4ai__md` and the turn succeeds with citations.
+- **What a user would think:** "Something is broken" — red error text in
+  their very first research turn, even though the answer arrives cited.
+- **Change:** documented the error as expected in the README's Web research
+  section. Whether the plugin should be configured to not register its Fetch
+  tool at all is a design question left for the maintainer (plugin config is
+  pinned/reviewed; out of scope here).
+
+### 6. Nothing in `container logs dsh` proves the circuit-breaker is live — logged only
+
+- **What happened:** the container log shows the seed-version string
+  (`...breaker-5...`) and nothing else about plugins; there is no
+  "activated" line. The only way to confirm the breaker works is to trip it
+  (I asked the agent to run the same command 20 times: 6 ran, 14 denied,
+  one incident row in `/workspace/.circuit-breaker-incidents.jsonl`).
+- **What a user would think:** they can't tell the loop guard is armed
+  without deliberately provoking it; most will simply trust it.
+- **Change:** none in the repo (activation logging is upstream dsh/plugin
+  behavior). Noted here so the maintainer can decide whether entrypoint or
+  verify.sh should probe for it.
+
 ### Non-repo notes (environment, not README failures)
 
 - The wizard's local-port probe correctly found nothing (model server is on a

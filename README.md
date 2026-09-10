@@ -67,7 +67,9 @@ Five commands, in this order. Each one needs the output of the one before it.
 
 Then open **http://127.0.0.1:3080**. Type the IP form, not `localhost`: the
 publish binds IPv4 loopback only, and apple/container cannot publish v4 and v6
-on the same host port. Choose `/workspace` and go.
+on the same host port. In the workspace picker, click the pencil icon and type
+`/workspace` — the picker opens in the container's (empty) home directory and
+`/workspace` is not browsable from there. Then go.
 
 ## Allowing a destination
 
@@ -105,6 +107,13 @@ bundle, and the home patch layer survives seed syncs. The agent gets
 `mcp__crawl4ai__*` tools (markdown-from-URL, screenshots, crawling) and uses
 them: ask it to research something and it searches via SearXNG, reads pages
 via Crawl4AI, and cites them.
+
+Expect one red error in research turns: dsh-web-tools also registers its own
+generic Fetch tool, and every fetch-capable provider behind it is deliberately
+unconfigured (Crawl4AI is the fetcher here), so a first fetch attempt logs
+`configured web provider "dsh-web-tools-fetch" is registered but unavailable`
+before the agent falls back to `mcp__crawl4ai__md`. The turn still succeeds;
+the error is cosmetic.
 
 The [@dsh-external/dsh-deep-research](https://github.com/omdsh-dev/dsh-deep-research)
 orchestrator is also baked in (pinned to the PR #5 branch) but does NOT work
