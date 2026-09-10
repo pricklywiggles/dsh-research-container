@@ -26,9 +26,20 @@
   incident in `/workspace/.circuit-breaker-incidents.jsonl`). No plugin
   reports "did not activate". Note: `container logs dsh` shows no activation
   line at boot (entry 6).
-- [ ] 8. stop.sh / run.sh persistence cycle — NOT RUN (stopped here on the
-  owner's instruction).
-- [ ] 9. teardown-host.sh + reinstall — NOT RUN (same).
+- [x] 8. `./stop.sh` stopped all three containers and the runtime (apiserver
+  confirmed down); `./run.sh` brought everything back warm. A marker file
+  written to /workspace before the stop, the circuit-breaker incident log,
+  and the tool-web `fetch: false` override all survived; verify.sh again
+  0 failed / 0 warned.
+- [x] 9. `./teardown-host.sh` removed all four launchd jobs, restored the
+  stock pf ruleset, deleted both pf files, and stopped squid restoring its
+  pre-dsh config. Post-teardown checks: no dsh plists or launchd jobs, pf
+  files gone, squid unloaded. `./setup-host.sh` reinstall over the clean
+  teardown succeeded (kept secrets.env, re-bootstrapped everything) and its
+  "pf was enabled before setup: yes" line confirms teardown had restored
+  pf's enabled state. doctor.sh 31 ok / 0 warn / 0 fail after reinstall;
+  run.sh + verify.sh brought the box back green. One bug found and fixed on
+  the way (entry 9).
 
 A cold install of dsh-research-container on a clean Mac (Apple silicon,
 macOS 27 / Darwin 27.0.0), following README.md literally, top to bottom.
@@ -166,6 +177,22 @@ Model server: an OpenAI-compatible server on a Tailscale peer
   `mcp__crawl4ai__md` directly, no Fetch step, no red error; answer (socat
   1.8.1.3, 2026-06-26) cited and correct. The README sentence from entry 5
   was updated to describe the disabled tool rather than the expected error.
+
+### 9. Host scripts' no-TTY sudo fallback broke when SUDO_ASKPASS was preset — fixed
+
+- **What happened:** setup-host.sh and teardown-host.sh have a thoughtful
+  no-TTY fallback (osascript password dialog, commented "e.g. run from
+  Claude Code") — but they only passed `-A` to sudo when they *created* the
+  helper. With `SUDO_ASKPASS` already exported by the caller and no TTY,
+  the scripts skipped both the helper and `-A`, so sudo ignored the
+  variable and died: "a terminal is required to read the password".
+  teardown-host.sh exited 1 having torn down nothing.
+- **What a user would think:** an agent-driven or scripted invocation that
+  sets its own askpass (a natural thing to do) fails with a sudo error that
+  looks like the environment's fault, not the script's.
+- **Change:** in both scripts, `-A` is now set whenever stdin is not a TTY,
+  whether or not the helper had to be created. Verified: teardown and the
+  reinstall both ran to completion via the scripts' own GUI dialog.
 
 ### Non-repo notes (environment, not README failures)
 
