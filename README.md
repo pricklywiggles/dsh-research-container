@@ -67,7 +67,14 @@ Five commands, in this order. Each one needs the output of the one before it.
 
 Then open **http://127.0.0.1:3080**. Type the IP form, not `localhost`: the
 publish binds IPv4 loopback only, and apple/container cannot publish v4 and v6
-on the same host port. Choose `/workspace` and go.
+on the same host port. In the workspace picker, click the pencil icon and type
+`/workspace` — the picker opens in the container's (empty) home directory and
+`/workspace` is not browsable from there.
+
+Then type `/research <your topic>` in the chat box. That command — and the
+`/deep-research` family next to it — is what this box exists for: deep,
+cited web research where no query, page fetch, or model token ever leaves
+your own infrastructure. [Research skills](#research-skills) describes them.
 
 ## Allowing a destination
 
@@ -95,6 +102,15 @@ want the change to survive. `dsh-home/settings.yaml` already points the plugin
 at the relay, so there is nothing to set in the UI. No API keys, and search
 queries stay on your machines.
 
+Upstream engines throttle bursty traffic from a single IP, so during heavy
+agent use `container logs searxng` fills with CAPTCHA and "too many
+requests" suspensions (DuckDuckGo, Qwant, and Brave are the usual ones).
+That is normal, not a broken box: the engine mix in
+`host/templates/searxng-settings.yml.tmpl` exists so other engines keep
+answering while suspensions expire on their own, typically within minutes.
+A thin or empty result set is only a real problem if verify.sh check 5
+(open-network egress) fails too — check 7 tells the two apart.
+
 Page fetching runs through a self-hosted [Crawl4AI](https://github.com/unclecode/crawl4ai)
 container (same trust pattern: open network, gateway relay on 8890; image
 derived in `host/crawl4ai/` to bind non-loopback, token auth). Its built-in
@@ -106,6 +122,14 @@ bundle, and the home patch layer survives seed syncs. The agent gets
 them: ask it to research something and it searches via SearXNG, reads pages
 via Crawl4AI, and cites them.
 
+dsh-web-tools also ships a generic `web_fetch` tool, but every fetch-capable
+provider behind it is deliberately unconfigured here (Crawl4AI is the
+fetcher), so this box disables its registration outright: the `tool-web` row
+in `host/templates/cordis.patch.yml.tmpl` sets `fetch: false`. Without it,
+each research turn logged a red "registered but unavailable" error before
+falling back to Crawl4AI, and the skills had to carry a prompt-level "do not
+use Fetch" warning that a looping model would eventually ignore.
+
 The [@dsh-external/dsh-deep-research](https://github.com/omdsh-dev/dsh-deep-research)
 orchestrator is also baked in (pinned to the PR #5 branch) but does NOT work
 on dsh 0.1.1-rc.2's web profile: its `deep_research` tool cannot reach the
@@ -113,6 +137,25 @@ preset-isolated workflowEngine from host scope. Agent contexts do not inherit
 preset realm labels, confirmed via a Creator-mode inspection session, and even
 `agentPresets.serviceForAgent` resolution failed in practice. Multi-page cited
 research works fine without it via the search+fetch loop above.
+
+## Research skills
+
+The reason this box exists: slash-invocable research commands that replace
+hosted deep-research tools, running entirely on infrastructure you control.
+They are dsh's Claude-style SKILL.md dirs, live-discovered from
+`dsh-home/skills/` — type `/` in the chat box to see them.
+
+- `/research <topic>` runs a one-shot deep exploration with pacing, fetch
+  fallbacks, and a cited gaps-and-contradictions report.
+- The `/deep-research` family is a port of
+  [Weizhena/Deep-Research-skills](https://github.com/Weizhena/Deep-Research-skills):
+  structured items×fields research with human-in-the-loop checkpoints.
+  Flow: `/deep-research <topic>` (outline as outline.yaml + fields.yaml in
+  /workspace) → `/deep-research-add-items` / `-add-fields` (refine) →
+  `/deep-research-run` (parallel researcher subagents write validated JSON
+  per item) → `/deep-research-report` (markdown report, uncertain values
+  skipped). The researcher briefing + search-strategy modules live in
+  `dsh-home/skills/deep-research/`.
 
 ## Loop guard: dsh-circuit-breaker
 
@@ -151,20 +194,6 @@ profile's `pnpm-workspace.yaml` before installing. node-pty has no linux-arm64
 prebuild and compiles from source via node-gyp, which is why `build-essential`
 and `python3` are in the image. Without the compile the plugin still loads,
 just with the terminal disabled ("degraded mode").
-
-Skills (dsh's Claude-style SKILL.md dirs, live-discovered from
-`dsh-home/skills/`, slash-invocable):
-- `/research` runs a one-shot deep exploration with pacing, fetch fallbacks,
-  and a cited gaps-and-contradictions report.
-- The `/deep-research` family is a port of
-  [Weizhena/Deep-Research-skills](https://github.com/Weizhena/Deep-Research-skills):
-  structured items×fields research with human-in-the-loop checkpoints.
-  Flow: `/deep-research <topic>` (outline as outline.yaml + fields.yaml in
-  /workspace) → `/deep-research-add-items` / `-add-fields` (refine) →
-  `/deep-research-run` (parallel researcher subagents write validated JSON
-  per item) → `/deep-research-report` (markdown report, uncertain values
-  skipped). The researcher briefing + search-strategy modules live in
-  `dsh-home/skills/deep-research/`.
 
 ## Daily use
 

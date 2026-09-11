@@ -186,4 +186,14 @@ if [ "$FAIL" -gt 0 ]; then
   echo "Fix the failures above before ./setup-host.sh."
   exit 1
 fi
-echo "Preflight clear. Next: ./setup.sh, ./setup-host.sh, ./run.sh, ./verify.sh"
+# Point at the actual next step instead of re-listing the whole pipeline:
+# the checks above already established what is and is not in place.
+if [ ! -f config.env ]; then
+  echo "Preflight clear. Next: ./setup.sh"
+elif [ ! -f secrets.env ] || [ ! -f /etc/pf.anchors/dsh-egress ]; then
+  echo "Preflight clear. Next: ./setup-host.sh, then ./run.sh and ./verify.sh"
+elif [ "$dsh_up" != yes ]; then
+  echo "Preflight clear. Next: ./run.sh, then ./verify.sh"
+else
+  echo "Preflight clear. The box is running; ./verify.sh proves the lockdown."
+fi

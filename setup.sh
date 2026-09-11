@@ -273,6 +273,7 @@ kv() { printf "%s='%s'\n" "$1" "$(printf '%s' "$2" | sed "s/'/'\\\\''/g")"; }
 echo
 bold "Wrote config.env"
 echo "Next:"
+echo "  ./doctor.sh        read-only preflight against this config; fix any FAIL"
 echo "  ./setup-host.sh    installs the firewall, proxy and relays (asks for sudo)"
 echo "  ./run.sh           builds and starts the box"
 echo "  ./verify.sh        proves the lockdown works"

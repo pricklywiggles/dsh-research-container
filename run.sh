@@ -34,7 +34,9 @@ container system start 2>/dev/null || true
 # A network freezes its subnet at creation, exactly like a container freezes
 # its mounts. If config.env changed SUBNET, a kept network would put dsh on a
 # subnet the pf anchor no longer covers: no default-deny, dead relays.
-have_subnet="$(container network inspect "$NET" 2>/dev/null | jq -r '.[0].configuration.ipv4Subnet // empty')"
+# `network inspect` exits nonzero when the network does not exist yet (every
+# first run); under pipefail that would kill the script with no output.
+have_subnet="$(container network inspect "$NET" 2>/dev/null | jq -r '.[0].configuration.ipv4Subnet // empty' || true)"
 if [ -n "$have_subnet" ] && [ "$have_subnet" != "$SUBNET" ]; then
   echo "dshnet is $have_subnet but config.env says $SUBNET; recreating the network"
   recreate "$NAME"
